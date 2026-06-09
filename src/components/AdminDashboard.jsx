@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
-import { MOCK_COURSES, MOCK_COLLEGES } from '../mockData';
-import { Users, FileText, Landmark, ShieldAlert, PlusCircle, CheckCircle, AlertCircle, Link } from 'lucide-react';
+import { MOCK_COURSES, MOCK_COLLEGES, MOCK_QUESTIONS } from '../mockData';
+import { Users, FileText, Landmark, ShieldAlert, PlusCircle, CheckCircle, AlertCircle, Link, ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function AdminDashboard({ user }) {
   const [metrics, setMetrics] = useState({ users: 0, assessments: 0, applications: 0 });
@@ -11,6 +11,8 @@ export default function AdminDashboard({ user }) {
   const [coursesList, setCoursesList] = useState([]);
   const [mappingsList, setMappingsList] = useState([]);
   const [activeTab, setActiveTab] = useState('metrics');
+  const [responsesMap, setResponsesMap] = useState({});
+  const [expandedUserId, setExpandedUserId] = useState(null);
 
   // Form states for adding colleges
   const [colName, setColName] = useState('');
@@ -65,6 +67,19 @@ export default function AdminDashboard({ user }) {
       const { data: courses } = await supabase.from('courses').select('*');
       const { data: colleges } = await supabase.from('colleges').select('*');
       const { data: mappings } = await supabase.from('college_courses').select('*');
+
+      // 4. Fetch user responses
+      const { data: allResponses } = await supabase.from('user_responses').select('*');
+      const respMap = {};
+      if (allResponses) {
+        allResponses.forEach(r => {
+          if (!respMap[r.user_id]) {
+            respMap[r.user_id] = [];
+          }
+          respMap[r.user_id].push(r);
+        });
+      }
+      setResponsesMap(respMap);
 
       const allCourses = courses || MOCK_COURSES;
       const allColleges = colleges || MOCK_COLLEGES;
@@ -216,6 +231,10 @@ export default function AdminDashboard({ user }) {
     }
   };
 
+  const attendees = profilesList.filter(prof => 
+    prof.course_preferred || (responsesMap[prof.id] && responsesMap[prof.id].length > 0)
+  );
+
   return (
     <div className="screen">
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
@@ -235,6 +254,12 @@ export default function AdminDashboard({ user }) {
           onClick={() => { setActiveTab('users'); setSuccessMsg(''); setErrorMsg(''); }}
         >
           Registered Users ({profilesList.length})
+        </button>
+        <button
+          className={`tab-btn ${activeTab === 'attendees' ? 'active' : ''}`}
+          onClick={() => { setActiveTab('attendees'); setSuccessMsg(''); setErrorMsg(''); }}
+        >
+          Quiz Attendees ({attendees.length})
         </button>
         <button
           className={`tab-btn ${activeTab === 'applications' ? 'active' : ''}`}
@@ -388,6 +413,91 @@ export default function AdminDashboard({ user }) {
                       </td>
                     </tr>
                   ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'attendees' && (
+        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+          <div className="tracker-table-container">
+            <table className="tracker-table">
+              <thead>
+                <tr>
+                  <th>Student Name</th>
+                  <th>Phone Number</th>
+                  <th>Contact Email</th>
+                  <th>Assessment Status</th>
+                  <th>Course Match</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {attendees.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                      No students have started the questionnaire yet.
+                    </td>
+                  </tr>
+                ) : (
+                  attendees.map((prof) => {
+                    const userResponses = responsesMap[prof.id] || [];
+                    const isCompleted = !!prof.course_preferred;
+                    const isExpanded = expandedUserId === prof.id;
+
+                    return (
+                      <React.Fragment key={prof.id}>
+                        <tr>
+                          <td style={{ fontWeight: 600, color: '#fff' }}>{prof.name || 'Student'}</td>
+                          <td style={{ color: 'var(--gold)', fontWeight: 600 }}>{prof.phone || 'Not Provided'}</td>
+                          <td>{prof.email}</td>
+                          <td>
+                            <span className="status-badge" style={{ background: isCompleted ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)', color: isCompleted ? '#10b981' : '#f59e0b', border: `1px solid ${isCompleted ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`, padding: '4px 8px', borderRadius: '4px', fontSize: '0.78rem' }}>
+                              {isCompleted ? 'Completed' : `In Progress (${userResponses.length}/10)`}
+                            </span>
+                          </td>
+                          <td style={{ fontWeight: 500, color: 'var(--gold-light)' }}>
+                            {prof.course_preferred || 'Calculating...'}
+                          </td>
+                          <td>
+                            <button
+                              className="btn btn-outline"
+                              onClick={() => setExpandedUserId(isExpanded ? null : prof.id)}
+                              style={{ padding: '4px 10px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px', height: 'auto', background: 'transparent' }}
+                            >
+                              Answers {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                            </button>
+                          </td>
+                        </tr>
+                        {isExpanded && (
+                          <tr>
+                            <td colSpan="6" style={{ background: 'rgba(13, 27, 46, 0.4)', padding: '1.5rem', borderBottom: '1px solid var(--border)' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                <h4 style={{ color: 'var(--gold-light)', fontSize: '0.92rem', marginBottom: '8px', fontFamily: 'var(--font-body)' }}>
+                                  Questionnaire Answers for {prof.name || 'Student'}
+                                </h4>
+                                {MOCK_QUESTIONS.map((q) => {
+                                  const ans = userResponses.find(r => r.question_id === q.id);
+                                  return (
+                                    <div key={q.id} style={{ fontSize: '0.85rem', padding: '10px 14px', borderLeft: '3px solid var(--gold)', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '0 8px 8px 0', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                                      <div style={{ fontWeight: 600, color: 'rgba(255, 255, 255, 0.8)' }}>
+                                        Q{q.id}: {q.question}
+                                      </div>
+                                      <div style={{ color: ans ? '#fff' : 'var(--text-muted)', marginTop: '4px', fontSize: '0.82rem', fontWeight: ans ? 500 : 400 }}>
+                                        {ans ? `Selected: ${ans.answer}` : 'No answer registered'}
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    );
+                  })
                 )}
               </tbody>
             </table>
