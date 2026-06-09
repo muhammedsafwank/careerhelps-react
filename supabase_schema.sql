@@ -71,6 +71,15 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- 5b. GUEST_LEADS TABLE (For anonymous quiz attendees)
+CREATE TABLE IF NOT EXISTS public.guest_leads (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT,
+    phone TEXT,
+    course_preferred TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- 6. USER_RESPONSES (For questionnaire answers)
 CREATE TABLE IF NOT EXISTS public.user_responses (
     id SERIAL PRIMARY KEY,
@@ -115,6 +124,7 @@ ALTER TABLE public.college_courses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_responses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.applications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.guest_leads ENABLE ROW LEVEL SECURITY;
 
 -- Courses Policies
 CREATE POLICY "Allow public read access to courses" ON public.courses FOR SELECT USING (true);
@@ -149,6 +159,13 @@ CREATE POLICY "Allow users to view their own applications" ON public.application
 CREATE POLICY "Allow users to create their own applications" ON public.applications FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Allow users to update their own applications" ON public.applications FOR UPDATE USING (auth.uid() = user_id);
 CREATE POLICY "Allow admin to manage all applications" ON public.applications FOR ALL USING (
+    public.is_admin() = true
+);
+
+-- Guest Leads Policies
+CREATE POLICY "Allow public insert to guest_leads" ON public.guest_leads FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public update to guest_leads" ON public.guest_leads FOR UPDATE USING (true);
+CREATE POLICY "Allow admin to view all guest_leads" ON public.guest_leads FOR SELECT USING (
     public.is_admin() = true
 );
 

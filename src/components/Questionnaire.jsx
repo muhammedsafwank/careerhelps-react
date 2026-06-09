@@ -38,6 +38,17 @@ export default function Questionnaire({ user, profile, onQuizComplete }) {
           .update({ name: studentName.trim(), phone: phoneClean })
           .eq('id', user.id);
         if (error) throw error;
+      } else {
+        // Create an anonymous guest lead in the guest_leads table
+        const { data, error } = await supabase
+          .from('guest_leads')
+          .insert({ name: studentName.trim(), phone: phoneClean })
+          .select()
+          .single();
+        if (error) throw error;
+        if (data && data.id) {
+          localStorage.setItem('guest_lead_id', data.id);
+        }
       }
       
       // Save locally to localStorage so that if the guest registers later,
@@ -173,6 +184,15 @@ export default function Questionnaire({ user, profile, onQuizComplete }) {
           .from('profiles')
           .update({ course_preferred: matchedCourse })
           .eq('id', user.id);
+      } else {
+        // Update guest lead preferred course in database
+        const leadId = localStorage.getItem('guest_lead_id');
+        if (leadId) {
+          await supabase
+            .from('guest_leads')
+            .update({ course_preferred: matchedCourse })
+            .eq('id', leadId);
+        }
       }
 
       // Trigger callback to parent

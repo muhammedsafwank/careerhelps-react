@@ -13,6 +13,7 @@ export default function AdminDashboard({ user }) {
   const [activeTab, setActiveTab] = useState('metrics');
   const [responsesMap, setResponsesMap] = useState({});
   const [expandedUserId, setExpandedUserId] = useState(null);
+  const [guestLeadsList, setGuestLeadsList] = useState([]);
 
   // Form states for adding colleges
   const [colName, setColName] = useState('');
@@ -80,6 +81,10 @@ export default function AdminDashboard({ user }) {
         });
       }
       setResponsesMap(respMap);
+
+      // 5. Fetch guest leads
+      const { data: guestLeads } = await supabase.from('guest_leads').select('*');
+      setGuestLeadsList(guestLeads || []);
 
       const allCourses = courses || MOCK_COURSES;
       const allColleges = colleges || MOCK_COLLEGES;
@@ -231,9 +236,30 @@ export default function AdminDashboard({ user }) {
     }
   };
 
-  const attendees = profilesList.filter(prof => 
-    prof.course_preferred || (responsesMap[prof.id] && responsesMap[prof.id].length > 0)
-  );
+  const attendees = [
+    ...profilesList.filter(prof => 
+      prof.course_preferred || (responsesMap[prof.id] && responsesMap[prof.id].length > 0)
+    ).map(prof => ({
+      id: prof.id,
+      name: prof.name,
+      phone: prof.phone,
+      email: prof.email,
+      course_preferred: prof.course_preferred,
+      is_guest: false,
+      created_at: prof.created_at,
+      responsesCount: responsesMap[prof.id]?.length || 0
+    })),
+    ...guestLeadsList.map(lead => ({
+      id: lead.id,
+      name: lead.name,
+      phone: lead.phone,
+      email: 'Anonymous (Guest)',
+      course_preferred: lead.course_preferred,
+      is_guest: true,
+      created_at: lead.created_at,
+      responsesCount: lead.course_preferred ? 10 : 1
+    }))
+  ];
 
   return (
     <div className="screen">
@@ -443,7 +469,7 @@ export default function AdminDashboard({ user }) {
                   </tr>
                 ) : (
                   attendees.map((prof) => {
-                    const userResponses = responsesMap[prof.id] || [];
+                    const userResponses = prof.is_guest ? [] : (responsesMap[prof.id] || []);
                     const isCompleted = !!prof.course_preferred;
                     const isExpanded = expandedUserId === prof.id;
 
@@ -452,23 +478,27 @@ export default function AdminDashboard({ user }) {
                         <tr>
                           <td style={{ fontWeight: 600, color: '#fff' }}>{prof.name || 'Student'}</td>
                           <td style={{ color: 'var(--gold)', fontWeight: 600 }}>{prof.phone || 'Not Provided'}</td>
-                          <td>{prof.email}</td>
+                          <td style={{ color: prof.is_guest ? 'var(--text-muted)' : 'inherit', fontStyle: prof.is_guest ? 'italic' : 'normal' }}>{prof.email}</td>
                           <td>
                             <span className="status-badge" style={{ background: isCompleted ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)', color: isCompleted ? '#10b981' : '#f59e0b', border: `1px solid ${isCompleted ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`, padding: '4px 8px', borderRadius: '4px', fontSize: '0.78rem' }}>
-                              {isCompleted ? 'Completed' : `In Progress (${userResponses.length}/10)`}
+                              {prof.is_guest ? (isCompleted ? 'Completed (Guest)' : 'In Progress (Guest)') : (isCompleted ? 'Completed' : `In Progress (${userResponses.length}/10)`)}
                             </span>
                           </td>
                           <td style={{ fontWeight: 500, color: 'var(--gold-light)' }}>
                             {prof.course_preferred || 'Calculating...'}
                           </td>
                           <td>
-                            <button
-                              className="btn btn-outline"
-                              onClick={() => setExpandedUserId(isExpanded ? null : prof.id)}
-                              style={{ padding: '4px 10px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px', height: 'auto', background: 'transparent' }}
-                            >
-                              Answers {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-                            </button>
+                            {prof.is_guest ? (
+                              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>Lead (Guest)</span>
+                            ) : (
+                              <button
+                                className="btn btn-outline"
+                                onClick={() => setExpandedUserId(isExpanded ? null : prof.id)}
+                                style={{ padding: '4px 10px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px', height: 'auto', background: 'transparent' }}
+                              >
+                                Answers {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                              </button>
+                            )}
                           </td>
                         </tr>
                         {isExpanded && (

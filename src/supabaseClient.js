@@ -77,6 +77,7 @@ if (isLiveSupabase) {
     let courses = JSON.parse(localStorage.getItem('mock_courses') || '[]');
     let colleges = JSON.parse(localStorage.getItem('mock_colleges') || '[]');
     let college_courses = JSON.parse(localStorage.getItem('mock_college_courses') || '[]');
+    let guest_leads = JSON.parse(localStorage.getItem('mock_guest_leads') || '[]');
 
     let tableData = [];
     if (state.table === 'profiles') tableData = profiles;
@@ -85,6 +86,7 @@ if (isLiveSupabase) {
     else if (state.table === 'courses') tableData = courses;
     else if (state.table === 'colleges') tableData = colleges;
     else if (state.table === 'college_courses') tableData = college_courses;
+    else if (state.table === 'guest_leads') tableData = guest_leads;
 
     if (state.method === 'select') {
       let filtered = [...tableData];
@@ -154,6 +156,14 @@ if (isLiveSupabase) {
           else college_courses.push(rec);
         }
         localStorage.setItem('mock_college_courses', JSON.stringify(college_courses));
+      } else if (state.table === 'guest_leads') {
+        for (const rec of newRecords) {
+          if (!rec.id) rec.id = crypto.randomUUID();
+          const index = guest_leads.findIndex(r => r.id === rec.id);
+          if (index > -1) guest_leads[index] = rec;
+          else guest_leads.push(rec);
+        }
+        localStorage.setItem('mock_guest_leads', JSON.stringify(guest_leads));
       }
 
       return { data: newRecords, error: null };
@@ -184,6 +194,8 @@ if (isLiveSupabase) {
         localStorage.setItem('mock_courses', JSON.stringify(updatedTable));
       } else if (state.table === 'colleges') {
         localStorage.setItem('mock_colleges', JSON.stringify(updatedTable));
+      } else if (state.table === 'guest_leads') {
+        localStorage.setItem('mock_guest_leads', JSON.stringify(updatedTable));
       }
 
       return { data: updatedRows, error: null };
