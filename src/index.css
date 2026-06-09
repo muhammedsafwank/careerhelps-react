@@ -152,17 +152,10 @@ body::after {
 .logo-mark {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, var(--gold), var(--gold-light));
   border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-head);
-  font-size: 24px;
-  color: var(--navy-dark);
-  font-weight: 700;
-  box-shadow: 0 4px 15px rgba(201, 168, 76, 0.35);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
   flex-shrink: 0;
+  object-fit: contain;
 }
 
 .brand-text h1 {

@@ -10,6 +10,7 @@ import ContactFAQ from './components/ContactFAQ';
 import AdminDashboard from './components/AdminDashboard';
 import LbsCalculator from './components/Calculator';
 import { ClipboardList, Award, User, HelpCircle, LogIn, LogOut, LayoutDashboard, Shield, Calculator } from 'lucide-react';
+import logoImg from './assets/logo.png';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState('landing');
@@ -161,7 +162,7 @@ function App() {
       {/* Header bar */}
       <header className="header">
         <div className="header-brand" onClick={() => setCurrentScreen('landing')}>
-          <div className="logo-mark">C</div>
+          <img src={logoImg} alt="Career Helps Logo" className="logo-mark" />
           <div className="brand-text">
             <h1>Career Helps</h1>
             <p>Happy to mould your future</p>
