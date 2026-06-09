@@ -506,7 +506,7 @@ export default function AdminDashboard({ user }) {
       )}
 
       {activeTab === 'colleges' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '2rem' }}>
+        <div className="admin-grid">
           {/* Add College Form */}
           <div className="card">
             <h3 className="section-head" style={{ marginBottom: '1.5rem' }}>Add New College</h3>
