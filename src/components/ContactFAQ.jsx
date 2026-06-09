@@ -145,7 +145,7 @@ export default function ContactFAQ() {
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <MapPin size={16} className="text-gold" />
-              <span>Kochi Infopark, Kerala, India</span>
+              <span>Calicut, Kerala</span>
             </div>
           </div>
         </div>
