@@ -119,7 +119,7 @@ export default function Tracker({ user, onNavigate }) {
 
       {applications.length === 0 ? (
         <div className="card" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-          <p style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--navy)', marginBottom: '0.5rem' }}>No applications submitted yet.</p>
+          <p style={{ fontSize: '1.1rem', fontWeight: 600, color: '#fff', marginBottom: '0.5rem' }}>No applications submitted yet.</p>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: '1.5rem' }}>
             Go through our recommendations list, select a college, and click "Apply" to start tracking your path.
           </p>
@@ -144,7 +144,7 @@ export default function Tracker({ user, onNavigate }) {
                 {applications.map((app) => (
                   <tr key={app.id}>
                     <td>
-                      <div style={{ fontWeight: 600, color: 'var(--navy)' }}>
+                      <div style={{ fontWeight: 600, color: '#fff' }}>
                         {app.colleges ? app.colleges.name : 'Unknown College'}
                       </div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>

@@ -30,7 +30,7 @@ export default function Landing({ onStartQuiz, user, onNavigate }) {
       </div>
 
       <div className="consent-box">
-        <p style={{ fontWeight: 600, color: 'var(--navy)', marginBottom: '0.4rem' }}>
+        <p style={{ fontWeight: 600, color: 'var(--gold-light)', marginBottom: '0.4rem' }}>
           Data Collection Consent (DPDP Act 2023 Compliant)
         </p>
         <p>

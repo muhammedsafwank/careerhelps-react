@@ -238,9 +238,9 @@ export default function Recommendations({ matchedCourse, user, onApplySuccess })
             </div>
 
             {filteredColleges.length === 0 ? (
-              <div className="consent-box" style={{ background: '#f8fafc', padding: '2rem', textAlign: 'center' }}>
-                <p style={{ fontWeight: 600, color: 'var(--navy)' }}>No matching colleges found.</p>
-                <p style={{ fontSize: '0.85rem' }}>Try expanding your filters on the sidebar (e.g. check "All States" or increase your budget range).</p>
+              <div className="consent-box" style={{ padding: '2rem', textAlign: 'center' }}>
+                <p style={{ fontWeight: 600, color: '#fff' }}>No matching colleges found.</p>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Try expanding your filters on the sidebar (e.g. check "All States" or increase your budget range).</p>
               </div>
             ) : (
               <div className="college-grid">

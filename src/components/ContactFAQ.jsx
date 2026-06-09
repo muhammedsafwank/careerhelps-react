@@ -131,11 +131,17 @@ export default function ContactFAQ() {
           <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.88rem', paddingLeft: '0.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Mail size={16} className="text-gold" />
-              <span>support@careerhelps.in</span>
+              <span>careerhelpsweb@gmail.com</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Phone size={16} className="text-gold" />
-              <span>+91 9447-CAREER (227337)</span>
+              <span>+91 7909222274</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+              <a href="https://instagram.com/career_helps" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>
+                @career_helps
+              </a>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <MapPin size={16} className="text-gold" />

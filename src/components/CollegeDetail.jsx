@@ -111,13 +111,13 @@ export default function CollegeDetail({ college, course, user, onClose, onApplyS
                 <p style={{ fontSize: '0.9rem', marginBottom: '6px' }}>
                   Accreditation: <strong className="text-gold" style={{ fontSize: '0.85rem' }}>{college.accreditation || 'State Board'}</strong>
                 </p>
-                <p style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--navy)', borderTop: '1px solid var(--border)', paddingTop: '8px', marginTop: '8px' }}>
+                <p style={{ fontSize: '1.2rem', fontWeight: 700, color: '#fff', borderTop: '1px solid var(--border)', paddingTop: '8px', marginTop: '8px' }}>
                   Annual Tuition: <span className="text-gold">₹{college.avg_fee.toLocaleString('en-IN')}</span>
                 </p>
               </div>
 
               <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                <p style={{ fontWeight: 600, color: 'var(--navy)', marginBottom: '4px' }}>Admission Eligibility:</p>
+                <p style={{ fontWeight: 600, color: 'var(--gold-light)', marginBottom: '4px' }}>Admission Eligibility:</p>
                 <ul style={{ paddingLeft: '1.25rem' }}>
                   <li>{course.eligibility}</li>
                   <li>Must possess valid 10th & 12th grade passing transcripts.</li>

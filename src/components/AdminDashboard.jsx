@@ -275,19 +275,19 @@ export default function AdminDashboard({ user }) {
           {/* Admin Metrics Grid */}
           <div className="admin-metrics">
             <div className="metric-card">
-              <Users size={32} style={{ color: 'var(--navy)', margin: '0 auto 0.5rem' }} />
+              <Users size={32} style={{ color: 'var(--gold-light)', margin: '0 auto 0.5rem' }} />
               <div className="metric-val">{metrics.users}</div>
               <div className="metric-label">Total Registered Students</div>
             </div>
 
             <div className="metric-card">
-              <FileText size={32} style={{ color: 'var(--navy)', margin: '0 auto 0.5rem' }} />
+              <FileText size={32} style={{ color: 'var(--gold-light)', margin: '0 auto 0.5rem' }} />
               <div className="metric-val">{metrics.assessments}</div>
               <div className="metric-label">Completed Assessments</div>
             </div>
 
             <div className="metric-card">
-              <Landmark size={32} style={{ color: 'var(--navy)', margin: '0 auto 0.5rem' }} />
+              <Landmark size={32} style={{ color: 'var(--gold-light)', margin: '0 auto 0.5rem' }} />
               <div className="metric-val">{metrics.applications}</div>
               <div className="metric-label">Applications Submitted</div>
             </div>
@@ -325,7 +325,7 @@ export default function AdminDashboard({ user }) {
                 ) : (
                   profilesList.map((prof) => (
                     <tr key={prof.id}>
-                      <td style={{ fontWeight: 600, color: 'var(--navy)' }}>{prof.name || 'Student'}</td>
+                      <td style={{ fontWeight: 600, color: '#fff' }}>{prof.name || 'Student'}</td>
                       <td>{prof.email}</td>
                       <td>{prof.marks_12th !== null ? `${prof.marks_12th}%` : 'Not Set'}</td>
                       <td style={{ fontWeight: 500, color: 'var(--gold)' }}>
@@ -367,7 +367,7 @@ export default function AdminDashboard({ user }) {
                   appsList.map((app) => (
                     <tr key={app.id}>
                       <td>
-                        <div style={{ fontWeight: 600, color: 'var(--navy)' }}>
+                        <div style={{ fontWeight: 600, color: '#fff' }}>
                           {app.profiles ? app.profiles.name : 'Unknown User'}
                         </div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -541,7 +541,7 @@ export default function AdminDashboard({ user }) {
             </div>
 
             <div className="card" style={{ padding: '1.25rem', maxHeight: '250px', overflowY: 'auto' }}>
-              <h4 style={{ fontSize: '0.9rem', marginBottom: '8px', color: 'var(--navy)' }}>Current Active Mappings ({mappingsList.length})</h4>
+              <h4 style={{ fontSize: '0.9rem', marginBottom: '8px', color: 'var(--gold-light)' }}>Current Active Mappings ({mappingsList.length})</h4>
               <ul style={{ fontSize: '0.82rem', paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 {mappingsList.map((m, idx) => {
                   const college = collegesList.find(c => c.id == m.college_id);
