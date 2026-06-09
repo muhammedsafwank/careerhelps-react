@@ -84,7 +84,7 @@ export default function ContactFAQ() {
                   type="text"
                   id="contact-name"
                   className="input-field"
-                  placeholder="e.g. Havath Kumar"
+                  placeholder="e.g. Rahul Kumar"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required

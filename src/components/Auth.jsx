@@ -96,7 +96,7 @@ export default function Auth({ onAuthSuccess, onNavigate }) {
                   type="text"
                   id="name-input"
                   className="input-field"
-                  placeholder="e.g. Havath Kumar"
+                  placeholder="e.g. Rahul Kumar"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   style={{ paddingLeft: '2.5rem' }}

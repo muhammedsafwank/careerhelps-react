@@ -47,7 +47,7 @@ if (isLiveSupabase) {
     localStorage.setItem('mock_profiles', JSON.stringify([
       {
         id: defaultAdminId,
-        name: "Havath (Admin)",
+        name: "System Administrator",
         email: "havathcareerhelps@gmail.com",
         phone: "",
         state: "",
