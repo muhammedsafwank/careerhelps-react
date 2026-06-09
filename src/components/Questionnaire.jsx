@@ -45,8 +45,15 @@ export default function Questionnaire({ user, profile, onQuizComplete }) {
           .insert({ name: studentName.trim(), phone: phoneClean })
           .select()
           .single();
-        if (error) throw error;
-        if (data && data.id) {
+        
+        if (error) {
+          console.warn('Insert with select failed, trying insert without select:', error);
+          // Try inserting without select (in case select policy is missing)
+          const { error: insertOnlyError } = await supabase
+            .from('guest_leads')
+            .insert({ name: studentName.trim(), phone: phoneClean });
+          if (insertOnlyError) throw insertOnlyError;
+        } else if (data && data.id) {
           localStorage.setItem('guest_lead_id', data.id);
         }
       }
@@ -59,7 +66,10 @@ export default function Questionnaire({ user, profile, onQuizComplete }) {
       setDetailsSubmitted(true);
     } catch (err) {
       console.error('Error saving student details:', err);
-      setDetailsError('Failed to save details. Please try again.');
+      // Fallback: save to localStorage anyway and let the student proceed!
+      localStorage.setItem('student_name', studentName.trim());
+      localStorage.setItem('student_phone', phoneClean);
+      setDetailsSubmitted(true);
     }
   };
 

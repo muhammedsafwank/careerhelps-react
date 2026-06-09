@@ -8,7 +8,8 @@ import Recommendations from './components/Recommendations';
 import Tracker from './components/Tracker';
 import ContactFAQ from './components/ContactFAQ';
 import AdminDashboard from './components/AdminDashboard';
-import { ClipboardList, Award, User, HelpCircle, LogIn, LogOut, LayoutDashboard, Shield } from 'lucide-react';
+import LbsCalculator from './components/Calculator';
+import { ClipboardList, Award, User, HelpCircle, LogIn, LogOut, LayoutDashboard, Shield, Calculator } from 'lucide-react';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState('landing');
@@ -131,6 +132,8 @@ function App() {
             key={appRefresh} // Re-render tracker on changes
           />
         );
+      case 'calculator':
+        return <LbsCalculator user={user} profile={profile} />;
       case 'contact':
         return <ContactFAQ />;
       case 'admin':
@@ -187,6 +190,13 @@ function App() {
             onClick={() => setCurrentScreen('tracker')}
           >
             <ClipboardList size={14} /> Tracker
+          </button>
+
+          <button
+            className={`nav-link ${currentScreen === 'calculator' ? 'active' : ''}`}
+            onClick={() => setCurrentScreen('calculator')}
+          >
+            <Calculator size={14} /> LBS Calculator
           </button>
 
           <button

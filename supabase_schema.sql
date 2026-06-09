@@ -165,9 +165,11 @@ CREATE POLICY "Allow admin to manage all applications" ON public.applications FO
 -- Guest Leads Policies
 CREATE POLICY "Allow public insert to guest_leads" ON public.guest_leads FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow public update to guest_leads" ON public.guest_leads FOR UPDATE USING (true);
+CREATE POLICY "Allow public select of guest_leads" ON public.guest_leads FOR SELECT USING (true);
 CREATE POLICY "Allow admin to view all guest_leads" ON public.guest_leads FOR SELECT USING (
     public.is_admin() = true
 );
+
 
 -- ==========================================
 -- TRIGGERS & FUNCTIONS
