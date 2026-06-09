@@ -104,6 +104,7 @@ function App() {
         return (
           <Questionnaire
             user={user}
+            profile={profile}
             onQuizComplete={handleQuizComplete}
           />
         );

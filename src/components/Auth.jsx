@@ -6,7 +6,7 @@ export default function Auth({ onAuthSuccess, onNavigate }) {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+  const [name, setName] = useState(localStorage.getItem('student_name') || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -41,6 +41,17 @@ export default function Auth({ onAuthSuccess, onNavigate }) {
           }
         });
         if (signUpError) throw signUpError;
+
+        // Copy guest phone number to profile
+        try {
+          const guestPhone = localStorage.getItem('student_phone');
+          if (guestPhone) {
+            await supabase.from('profiles').update({ phone: guestPhone }).eq('id', data.user.id);
+          }
+        } catch (dbErr) {
+          console.error("Failed to copy guest phone to profile:", dbErr);
+        }
+
         setSuccess('Signup successful! Welcome to Career Helps.');
         setTimeout(() => {
           onAuthSuccess(data.user);

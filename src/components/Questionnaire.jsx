@@ -1,14 +1,56 @@
 import React, { useState } from 'react';
 import { MOCK_QUESTIONS } from '../mockData';
 import { supabase } from '../supabaseClient';
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, User, Phone, AlertCircle } from 'lucide-react';
 
-export default function Questionnaire({ user, onQuizComplete }) {
+export default function Questionnaire({ user, profile, onQuizComplete }) {
+  const [detailsSubmitted, setDetailsSubmitted] = useState(false);
+  const [studentName, setStudentName] = useState(profile?.name || localStorage.getItem('student_name') || '');
+  const [studentPhone, setStudentPhone] = useState(profile?.phone || localStorage.getItem('student_phone') || '');
+  const [detailsError, setDetailsError] = useState('');
+
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answers, setAnswers] = useState(new Array(10).fill(null));
   const [saving, setSaving] = useState(false);
 
   const currentQuestion = MOCK_QUESTIONS[currentIdx];
+
+  const handleDetailsSubmit = async (e) => {
+    e.preventDefault();
+    setDetailsError('');
+
+    if (!studentName.trim()) {
+      setDetailsError('Please enter your name.');
+      return;
+    }
+
+    const phoneClean = studentPhone.trim().replace(/\D/g, ''); // strip non-digits
+    if (phoneClean.length !== 10) {
+      setDetailsError('Please enter a valid 10-digit phone number.');
+      return;
+    }
+
+    try {
+      if (user) {
+        // Update user profile in Supabase/Mock database
+        const { error } = await supabase
+          .from('profiles')
+          .update({ name: studentName.trim(), phone: phoneClean })
+          .eq('id', user.id);
+        if (error) throw error;
+      }
+      
+      // Save locally to localStorage so that if the guest registers later,
+      // the signup form can pull their name/phone number.
+      localStorage.setItem('student_name', studentName.trim());
+      localStorage.setItem('student_phone', phoneClean);
+
+      setDetailsSubmitted(true);
+    } catch (err) {
+      console.error('Error saving student details:', err);
+      setDetailsError('Failed to save details. Please try again.');
+    }
+  };
 
   const handleSelectOption = (optIdx) => {
     const updated = [...answers];
@@ -30,7 +72,6 @@ export default function Questionnaire({ user, onQuizComplete }) {
   };
 
   const calculateResult = () => {
-    // Port of the scoring logic from PDF / career_helps_app.html
     const scores = { nursing: 0, lab: 0, physio: 0, radiology: 0, any_stream: 0, open_dur: 0 };
     const a = answers;
 
@@ -144,6 +185,68 @@ export default function Questionnaire({ user, onQuizComplete }) {
       setSaving(false);
     }
   };
+
+  if (!detailsSubmitted) {
+    return (
+      <div className="screen" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+        <div className="card" style={{ maxWidth: '500px', width: '100%', padding: '2.5rem' }}>
+          <h2 className="card-title" style={{ textAlign: 'center', marginBottom: '0.5rem', fontSize: '1.6rem' }}>
+            Introduce Yourself
+          </h2>
+          <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem' }}>
+            Please enter your name and phone number to start the career counseling questionnaire.
+          </p>
+
+          {detailsError && (
+            <div className="consent-box" style={{ background: '#fef2f2', borderColor: '#fca5a5', color: '#991b1b', display: 'flex', gap: '8px', alignItems: 'center', padding: '0.75rem 1rem', marginBottom: '1.25rem' }}>
+              <AlertCircle size={18} />
+              <span style={{ fontSize: '0.85rem' }}>{detailsError}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleDetailsSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <div className="form-group">
+              <label htmlFor="student-name">Full Name</label>
+              <div style={{ position: 'relative' }}>
+                <User size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                <input
+                  type="text"
+                  id="student-name"
+                  className="input-field"
+                  placeholder="e.g. Rahul Kumar"
+                  value={studentName}
+                  onChange={(e) => setStudentName(e.target.value)}
+                  style={{ paddingLeft: '2.5rem' }}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="student-phone">Phone Number (10 digits)</label>
+              <div style={{ position: 'relative' }}>
+                <Phone size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                <input
+                  type="tel"
+                  id="student-phone"
+                  className="input-field"
+                  placeholder="e.g. 7909222274"
+                  value={studentPhone}
+                  onChange={(e) => setStudentPhone(e.target.value)}
+                  style={{ paddingLeft: '2.5rem' }}
+                  required
+                />
+              </div>
+            </div>
+
+            <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '0.5rem', justifyContent: 'center' }}>
+              Start Questionnaire <ArrowRight size={16} />
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   const progressPercent = Math.round(((currentIdx + 1) / MOCK_QUESTIONS.length) * 100);
 
