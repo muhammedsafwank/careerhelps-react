@@ -78,6 +78,7 @@ if (isLiveSupabase) {
     let colleges = JSON.parse(localStorage.getItem('mock_colleges') || '[]');
     let college_courses = JSON.parse(localStorage.getItem('mock_college_courses') || '[]');
     let guest_leads = JSON.parse(localStorage.getItem('mock_guest_leads') || '[]');
+    let followups = JSON.parse(localStorage.getItem('mock_followups') || '[]');
 
     let tableData = [];
     if (state.table === 'profiles') tableData = profiles;
@@ -87,6 +88,7 @@ if (isLiveSupabase) {
     else if (state.table === 'colleges') tableData = colleges;
     else if (state.table === 'college_courses') tableData = college_courses;
     else if (state.table === 'guest_leads') tableData = guest_leads;
+    else if (state.table === 'followups') tableData = followups;
 
     if (state.method === 'select') {
       let filtered = [...tableData];
@@ -164,6 +166,14 @@ if (isLiveSupabase) {
           else guest_leads.push(rec);
         }
         localStorage.setItem('mock_guest_leads', JSON.stringify(guest_leads));
+      } else if (state.table === 'followups') {
+        for (const rec of newRecords) {
+          if (!rec.id) rec.id = Math.floor(Math.random() * 1000000);
+          const index = followups.findIndex(r => r.id === rec.id);
+          if (index > -1) followups[index] = rec;
+          else followups.push(rec);
+        }
+        localStorage.setItem('mock_followups', JSON.stringify(followups));
       }
 
       return { data: newRecords, error: null };
@@ -196,9 +206,44 @@ if (isLiveSupabase) {
         localStorage.setItem('mock_colleges', JSON.stringify(updatedTable));
       } else if (state.table === 'guest_leads') {
         localStorage.setItem('mock_guest_leads', JSON.stringify(updatedTable));
+      } else if (state.table === 'followups') {
+        localStorage.setItem('mock_followups', JSON.stringify(updatedTable));
       }
 
       return { data: updatedRows, error: null };
+    }
+
+    if (state.method === 'delete') {
+      let deletedRows = [];
+      let updatedTable = tableData.filter(row => {
+        let match = true;
+        for (const f of state.filters) {
+          if (row[f.field] != f.value) match = false;
+        }
+        if (match) {
+          deletedRows.push(row);
+          return false;
+        }
+        return true;
+      });
+
+      if (state.table === 'profiles') {
+        localStorage.setItem('mock_profiles', JSON.stringify(updatedTable));
+      } else if (state.table === 'user_responses') {
+        localStorage.setItem('mock_user_responses', JSON.stringify(updatedTable));
+      } else if (state.table === 'applications') {
+        localStorage.setItem('mock_applications', JSON.stringify(updatedTable));
+      } else if (state.table === 'courses') {
+        localStorage.setItem('mock_courses', JSON.stringify(updatedTable));
+      } else if (state.table === 'colleges') {
+        localStorage.setItem('mock_colleges', JSON.stringify(updatedTable));
+      } else if (state.table === 'guest_leads') {
+        localStorage.setItem('mock_guest_leads', JSON.stringify(updatedTable));
+      } else if (state.table === 'followups') {
+        localStorage.setItem('mock_followups', JSON.stringify(updatedTable));
+      }
+
+      return { data: deletedRows, error: null };
     }
 
     return { data: null, error: 'Unknown query method' };
@@ -217,6 +262,10 @@ if (isLiveSupabase) {
     const chain = {
       select(fields = '*') {
         queryState.method = 'select';
+        return this;
+      },
+      delete() {
+        queryState.method = 'delete';
         return this;
       },
       insert(data) {

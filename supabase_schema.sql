@@ -67,6 +67,10 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     preferred_location TEXT,      -- Preferred state/city
     consent_given BOOLEAN DEFAULT FALSE,
     is_admin BOOLEAN DEFAULT FALSE,
+    lead_status TEXT DEFAULT 'New',
+    lead_quality TEXT DEFAULT 'New',
+    lead_source TEXT DEFAULT 'Direct',
+    admin_notes TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -77,6 +81,10 @@ CREATE TABLE IF NOT EXISTS public.guest_leads (
     name TEXT,
     phone TEXT,
     course_preferred TEXT,
+    lead_status TEXT DEFAULT 'New',
+    lead_quality TEXT DEFAULT 'New',
+    lead_source TEXT DEFAULT 'Direct',
+    admin_notes TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -103,6 +111,17 @@ CREATE TABLE IF NOT EXISTS public.applications (
     UNIQUE (user_id, college_id, course_id)
 );
 
+-- 8. FOLLOWUPS TABLE
+CREATE TABLE IF NOT EXISTS public.followups (
+    id SERIAL PRIMARY KEY,
+    student_id UUID NOT NULL,
+    follow_date TIMESTAMPTZ DEFAULT NOW(),
+    details TEXT NOT NULL,
+    remarks TEXT,
+    next_followup TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- ==========================================
 -- ROW LEVEL SECURITY (RLS) POLICIES
 -- ==========================================
@@ -125,6 +144,7 @@ ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_responses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.applications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.guest_leads ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.followups ENABLE ROW LEVEL SECURITY;
 
 -- Courses Policies
 CREATE POLICY "Allow public read access to courses" ON public.courses FOR SELECT USING (true);
@@ -167,6 +187,12 @@ CREATE POLICY "Allow public insert to guest_leads" ON public.guest_leads FOR INS
 CREATE POLICY "Allow public update to guest_leads" ON public.guest_leads FOR UPDATE USING (true);
 CREATE POLICY "Allow public select of guest_leads" ON public.guest_leads FOR SELECT USING (true);
 CREATE POLICY "Allow admin to view all guest_leads" ON public.guest_leads FOR SELECT USING (
+    public.is_admin() = true
+);
+
+-- Followups Policies
+CREATE POLICY "Allow public read access to followups" ON public.followups FOR SELECT USING (true);
+CREATE POLICY "Allow admin to manage all followups" ON public.followups FOR ALL USING (
     public.is_admin() = true
 );
 
